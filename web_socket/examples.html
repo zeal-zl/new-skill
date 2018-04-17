@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>练习 websocket</title>
+</head>
+
+<body>
+  <div>
+    <button id="connection">连接</button>
+    <button id="disconnect">断开</button>
+
+    <input id="content" type="text">
+    <Button id="submit">click me</Button>
+
+    <div></div>
+  </div>
+</body>
+<script>
+  if (WebSocket) {
+    const connection = document.getElementById('connection')
+    const disconnect = document.getElementById('disconnect')
+    const content = document.getElementById('content')
+    const submit = document.getElementById('submit')
+
+    let ws = new WebSocket('wss://echo.websocket.org')
+    ws.binaryType = 'arraybuffer'
+
+    connection.addEventListener('click', function () {
+      ws = new WebSocket('wss://echo.websocket.org')
+    })
+
+    disconnect.addEventListener('click', () => {
+      ws.close()
+    })
+
+    submit.addEventListener('click', () => {
+      if (ws.readyState === ws.OPEN) {
+        const info = content.value
+        ws.send(info)
+      } else {
+        console.log('还未连接')
+      }
+    }, false)
+
+    ws.addEventListener('open', () => {
+      setTimeout(() => { console.log(ws.readyState) }, 400)
+    })
+
+    ws.onopen = (e) => {
+      if (ws.readyState === ws.CONNECTING) {
+        console.log('连接中...')
+      } else if (ws.readyState === ws.OPEN) {
+        console.log('已连接')
+      }
+    }
+
+    ws.onmessage = (e) => {
+      console.log('返回数据对象 ==>', e)
+      console.log('返回数据 ==>', e.data)
+    }
+
+    ws.onclose = (e) => {
+      if (ws.readyState === 2) {
+        console.log('关闭中...')
+        console.log('返回数据 ==>', e)
+      } else {
+        console.log('已关闭')
+        console.log('返回数据 ==>', e)
+      }
+    }
+
+    ws.onerror = (e) => {
+      console.log('发生错误 ==>', e)
+    }
+  } else {
+    alert('您浏览器不支持WebSocket')
+  }
+</script>
+
+</html>
